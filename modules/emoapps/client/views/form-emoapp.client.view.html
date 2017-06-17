@@ -1,0 +1,24 @@
+<section>
+  <div class="page-header">
+    <h1>{{vm.emoapp._id ? 'Edit Emoapp' : 'New Emoapp'}}</h1>
+  </div>
+  <div class="col-md-12">
+    <form name="vm.form.emoappForm" class="form-horizontal" ng-submit="vm.save(vm.form.emoappForm.$valid)" novalidate>
+      <fieldset>
+        <div class="form-group" show-errors>
+          <label class="control-label" for="name">Name</label>
+          <input name="name" type="text" ng-model="vm.emoapp.name" id="name" class="form-control" placeholder="Name" required>
+          <div ng-messages="vm.form.emoappForm.name.$error" role="alert">
+            <p class="help-block error-text" ng-message="required">Emoapp name is required.</p>
+          </div>
+        </div>
+        <div class="form-group">
+          <button type="submit" class="btn btn-default">{{vm.emoapp._id ? 'Update' : 'Create'}}</button>
+        </div>
+        <div ng-show="vm.error" class="text-danger">
+          <strong ng-bind="vm.error"></strong>
+        </div>
+      </fieldset>
+    </form>
+  </div>
+</section>

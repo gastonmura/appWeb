@@ -1,0 +1,22 @@
+<section>
+  <div class="page-header">
+    <h1>Emoapps</h1>
+  </div>
+  <div class="list-group">
+    <a ng-repeat="emoapp in vm.emoapps"
+       ui-sref="emoapps.view({ emoappId: emoapp._id })"
+       class="list-group-item">
+      <small class="list-group-item-text">
+        Posted on
+        <span ng-bind="emoapp.created | date:'mediumDate'"></span>
+        by
+        <span ng-if="emoapp.user" ng-bind="emoapp.user.displayName"></span>
+        <span ng-if="!emoapp.user">Deleted User</span>
+      </small>
+      <h4 class="list-group-item-heading" ng-bind="emoapp.name"></h4>
+    </a>
+  </div>
+  <div class="alert alert-warning text-center" ng-if="vm.emoapps.$resolved && !vm.emoapps.length">
+    No Emoapps yet, why don't you <a ui-sref="emoapps.create">create one</a>?
+  </div>
+</section>

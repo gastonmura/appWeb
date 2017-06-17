@@ -1,0 +1,26 @@
+<section>
+  <div class="page-header">
+    <h1 ng-bind="vm.emoapp.name"></h1>
+  </div>
+  <div class="pull-right"
+       ng-show="vm.emoapp.isCurrentUserOwner">
+    <a class="btn btn-primary"
+       ui-sref="emoapps.edit({ emoappId: vm.emoapp._id })">
+      <i class="glyphicon glyphicon-edit"></i>
+    </a>
+    <a class="btn btn-primary" ng-click="vm.remove()">
+      <i class="glyphicon glyphicon-trash"></i>
+    </a>
+  </div>
+  <small>
+    <em class="text-muted">
+      Posted on
+      <span ng-bind="vm.emoapp.created | date:'mediumDate'"></span>
+      by
+      <span ng-if="vm.emoapp.user"
+            ng-bind="vm.emoapp.user.displayName"></span>
+      <span ng-if="!vm.emoapp.user">Deleted User</span>
+    </em>
+  </small>
+  <p class="lead" ng-bind="vm.emoapp.content"></p>
+</section>

@@ -1,0 +1,101 @@
+<link rel="stylesheet" href="/modules/emoapps/client/css/css.css"> 
+<section ng-controller="EmoappsMapController">
+  <div class="page-header">
+    <h1>Mapa Tweets Emotion</h1>
+  </div>
+  
+  <div id="map"> 	
+  </div>
+
+	<div class="panel panel-default" style="height: auto; overflow: hidden;">
+	  
+	  <div class="panel-body pull-left" id="detalleBusqueda">
+	  </div>
+
+	  <div class="spinner" id="spinnerLoading" style="visibility: hidden;">
+	   <div class="double-bounce1"></div>
+	   <div class="double-bounce2"></div>
+	  </div>
+		
+
+	     <div id="imgDrive" style="clear: both; padding: 0px 15px;"> 
+	     	
+ 		    <div class="page-header" ng-if="items.imagenes.length">
+ 				<h4 style="font-weight: bold; text-decoration: underline;">Imagenes Guardadas en Google Drive</h4>
+ 			</div> 
+
+	     	<div class="row"> 
+	     		
+	     		<div class="col-md-4" ng-repeat="pic in items.imagenes">
+
+				    <div class="thumbnail">
+				      <a href="{{pic.img}}" target="_blank">
+				        <img src="{{pic.img}}" class="img-rounded" style="margin: 0px auto; overflow: hidden; height: auto; display: block; width: 340px;">
+				      </a>  
+				        <div class="caption">
+				          <ul>
+							<li><a #{{pic.idTweet}}><b>#IdTweet:</b> {{pic.idTweet}}</a></li>
+							<li><b>Tweet Estado:</b> 
+								<span ng-switch on="pic.twEstado">
+								    <span ng-switch-when="Negativo" class="label label-danger">{{pic.twEstado}}</span>
+								    <span ng-switch-when="Positivo" class="label label-success">{{pic.twEstado}}</span>
+								    <span ng-switch-when="Neutro" 	class="label label-info">{{pic.twEstado}}</span>
+								</span>	
+							</li>
+						  
+						  </ul>
+				        </div>
+				      <!-- </a> -->
+				    </div>
+				  </div>
+
+
+	     	</div> 
+	     </div>
+
+
+	</div>
+  <div class="list-group" id="listaTw">
+    
+    <div ng-repeat="item in items.listaTweets"  class="list-group-item">
+		<a ng-href="https://twitter.com/{{item.screen_name}}" target="_blank"> 
+			<img src="{{item.perfil_img}}" class="img-rounded pull-left" style="margin-right: 5px;">
+		</a>	 
+		<a style="text-decoration: none; color: #000000;" ng-href="https://twitter.com/{{item.screen_name}}/status/{{item.idTweet}}" target="_blank">
+			<small class="list-group-item-text">
+				<span> <b> ({{$index + 1}}) #IdTweet</b> {{item.idTweet}} </span> |	
+				<b> Tweet Creado por </b>
+				<span ng-if="item.name" ng-bind="item.name"></span> |
+				<span ng-if="item.screen_name" ng-bind="item.screen_name"></span> | 
+				<span ng-bind="item.created_at | date:'mediumDate'"></span> |	
+				<span ng-if="item.location" ng-bind="item.location"></span>
+			</small>
+			<h4 class="list-group-item-heading" ng-bind="item.text"></h4>
+			<small class="list-group-item-text">
+				<span class="badge badge-info">Score {{item.score}}</span> | 
+				<span ng-switch on="item.twEstado">
+				    <span ng-switch-when="Negativo" class="label label-danger">{{item.twEstado}}</span>
+				    <span ng-switch-when="Positivo" class="label label-success">{{item.twEstado}}</span>
+				    <span ng-switch-when="Neutro" 	class="label label-info">{{item.twEstado}}</span>
+				</span>
+			</small>
+		</a>
+		<div style="display: block;width: 100%;height: auto;overflow: hidden;">
+			
+			<h4 ng-if="item.media_url.length" style="font-weight: bold; text-decoration: underline;">Imagenes</h4>
+			
+			<div ng-repeat="foto in item.media_url">
+			<a  name=”{{item.idTweet}}”></a>
+				<a ng-href="{{foto}}" target="_blank"> 
+					<img src="{{foto}}" class="img-rounded" style="margin-right: 5px; width: 85px;">
+				</a>	 
+			</div>
+		</div>
+
+    </div>
+
+  </div>
+
+  <!-- <div class="alert alert-info text-center" ng-if="!items.listaTweets.length">
+  </div> -->
+</section>
