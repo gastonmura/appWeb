@@ -249,7 +249,7 @@ function subirImagenes(imagen, ext, mime){
 
 exports.obtenerTweets = function(req, res) {
 
-  //console.log(req);
+  console.log("//********* INICIO NUEVA CONSULTA TWEET ***********//");
   
   var latitud = req.params.lat; //-43.253333;  
   var longitud = req.params.long; //-65.309444;
@@ -284,6 +284,79 @@ exports.obtenerTweets = function(req, res) {
       var twNeu = 0;
       var imgSalvadas = 0;
 
+            
+      function subirDrive(url){
+           
+            // abro imagen
+            var http = require('http'),                                                
+                Stream = require('stream').Transform,                                  
+                fs = require('fs');                                                    
+  
+          http.request(url, function(response) {                                        
+              
+              var data = new Stream();                                                    
+
+              response.on('data', function(chunk) {                                       
+                data.push(chunk);                                                         
+              });                                                                         
+
+              response.on('end', function() {                                             
+                
+                var imgRecu =  data.read();
+
+                //procesarImagenes(imagenTmp);
+                /* saco tipo y mime */
+                //const readChunk = require('read-chunk');
+                const fileType = require('file-type');
+                const buffer = imgRecu; //readChunk.sync("public/tmp/"+nombreImgUp, 0, 4100);
+                 
+                var tipo = fileType(buffer);
+                console.log(tipo);
+                
+                /* subo al drive */
+                var auth = authorize();
+
+                var drive = google.drive({
+                  version: 'v3',
+                  auth: auth
+                });
+                
+                //console.log("Nombre imagen: "+imagen);
+                var nombreImgUp =  require('crypto').createHash('md5').update(url).digest('hex');
+                //console.log("Nombre imagen local: "+nombreImgUp);
+
+                var folderId = '0B9jDZpLlxDeGZ0xobHNrWGZabWc';
+                
+                var fileMetadata = {
+                  'name': nombreImgUp+'.'+tipo.ext,
+                  parents: [ folderId ]
+                };
+                
+                var media = {
+                  mimeType: tipo.mime,
+                  body: imgRecu //fs.createReadStream("public/tmp/"+nombreImgUp)
+                };
+                
+                drive.files.create({
+                   resource: fileMetadata,
+                   media: media,
+                   fields: 'id'
+                }, function(err, file) {
+                  if(err) {
+                    // Handle error
+                    console.log(err);
+                  } else {
+                    console.log('File Id: ', file.id);
+                  }
+                });
+                /* fin subo al drive */
+
+              
+              });                                                                         
+            
+            }).end();
+      }
+      
       // recorro los tweets
       for (var i = 0; i < tws.length; i++) {
         
@@ -332,6 +405,7 @@ exports.obtenerTweets = function(req, res) {
         var media_url = [];
         // si existe obj media
         if( tws[i].entities.hasOwnProperty('media') ){
+          
           // recorro el arreglo de objetos media
           for (var j = 0; j < tws[i].entities.media.length; j++) {
             // si es una imagen la guardo 
@@ -346,74 +420,28 @@ exports.obtenerTweets = function(req, res) {
               imagenes.push({"idTweet":tws[i].id_str, "img":tws[i].entities.media[j].media_url, "twEstado":vote});
               
               // imagen que voy a bajar
-              var imagenTmp = tws[i].entities.media[j].media_url; 
-              console.log( "Imagen que voy a bajar: " + imagenTmp );
-
+              var imagenDrive = tws[i].entities.media[j].media_url; 
+              console.log( "Imagen que voy a bajar: " + imagenDrive );
               // nombre local con la cual la guardo
-              var nombreImgUp =  require('crypto').createHash('md5').update(imagenTmp).digest('hex')+'.tmp';
-              console.log( "Imagen local: " + nombreImgUp );
+              //var nombreImgUp =  require('crypto').createHash('md5').update(imagenTmp).digest('hex')+'.tmp';
+              //console.log( "Imagen local: " + nombreImgUp );
               
+              subirDrive(imagenDrive);
+
 
               // bajo la imagen
-              const download = require('image-downloader');
-              const options = {
-                url: imagenTmp,
-                dest: 'public/tmp/'+nombreImgUp              
-              };
+              //const download = require('image-downloader');
+              //const options = {
+              //  url: imagenTmp,
+              //  dest: 'public/tmp/'+nombreImgUp              
+              // };
                
-              download.image(options)
-                .then(({ filename, image }) => {
-                  
-                  console.log('Imagen salvada', imagenTmp);
-                  
-                  //procesarImagenes(imagenTmp);
-                  /* saco tipo y mime */
-                  const readChunk = require('read-chunk');
-                  const fileType = require('file-type');
-                  const buffer = readChunk.sync("public/tmp/"+nombreImgUp, 0, 4100);
-                   
-                  var tipo = fileType(buffer);
-                  console.log(tipo);
-                  
-                  /* subo al drive */
-                  var auth = authorize();
-
-                  var drive = google.drive({
-                    version: 'v3',
-                    auth: auth
-                  });
-                  
-                  //console.log("Nombre imagen: "+imagen);
-                  //var nombreImgUp =  require('crypto').createHash('md5').update(imagen).digest('hex')+'.tmp';
-                  //console.log("Nombre imagen local: "+nombreImgUp);
-
-                  var folderId = '0B9jDZpLlxDeGZ0xobHNrWGZabWc';
-                  var fileMetadata = {
-                    'name': nombreImgUp+'.'+tipo.ext,
-                    parents: [ folderId ]
-                  };
-                  var media = {
-                    mimeType: tipo.mime,
-                    body: fs.createReadStream("public/tmp/"+nombreImgUp)
-                  };
-                  drive.files.create({
-                     resource: fileMetadata,
-                     media: media,
-                     fields: 'id'
-                  }, function(err, file) {
-                    if(err) {
-                      // Handle error
-                      console.log(err);
-                    } else {
-                      console.log('File Id: ', file.id);
-                    }
-                  });
-                  /* fin subo al drive */
-
-
-                }).catch((err) => {
-                  throw err;
-                });
+              //download.image(options)
+              //  .then(({ filename, image }) => {
+              //    console.log('Imagen salvada', imagenTmp);
+              //  }).catch((err) => {
+              //    throw err;
+              //  });
 
               imgSalvadas++;
             }
